@@ -1,7 +1,7 @@
 @echo off
 
 git add .
-git commit -m 'init'
+git commit -m 'fckn_works!'
 git push
 
 echo Repo pushed

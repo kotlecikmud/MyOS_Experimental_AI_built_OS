@@ -88,12 +88,12 @@ void* pmm_alloc_block(void) {
     bitmap_set((uint64_t)bit);
     pmm_used_blocks++;
     /* Return the physical address; callers can map it through the HHDM. */
-    return (void*)((uint64_t)bit * PMM_PAGE_SIZE);
+    return (void*)(uintptr_t)((uint64_t)bit * PMM_PAGE_SIZE);
 }
 
 void pmm_free_block(void* ptr) {
     if (pmm_bitmap == NULL || ptr == NULL) return;
-    uint64_t addr = (uint64_t)ptr;
+    uint64_t addr = (uint64_t)(uintptr_t)ptr;
     if ((addr & (PMM_PAGE_SIZE - 1)) != 0) return;
     uint64_t bit = addr / PMM_PAGE_SIZE;
     if (bit >= pmm_max_blocks || !bitmap_test(bit)) return;

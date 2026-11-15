@@ -18,8 +18,8 @@ else ifeq ($(ARCH),armv6)
     LD = arm-none-eabi-ld
     CFLAGS = -Wall -Wextra -O2 -ffreestanding -mcpu=arm1176jzf-s -marm -Ikernel/include
     LDFLAGS = -T linker/armv6.ld -nostdlib -static
-    SRCS = arch/armv6/kernel.c arch/armv6/cpu.c arch/armv6/vectors.S kernel/src/serial.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c
-    OBJS = $(addprefix build/armv6/, $(notdir $(SRCS:.c=.o) $(SRCS:.S=.o)))
+    SRCS = arch/armv6/kernel.c arch/armv6/cpu.c arch/armv6/vectors.S kernel/src/serial.c kernel/src/mailbox.c kernel/src/hdmi.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c
+    OBJS = build/armv6/kernel.o build/armv6/cpu.o build/armv6/vectors.o build/armv6/serial.o build/armv6/mailbox.o build/armv6/hdmi.o build/armv6/pmm.o build/armv6/console.o build/armv6/vfs.o build/armv6/shell.o build/armv6/auth.o build/armv6/log.o
     TARGET = build/armv6/kernel.img
 
 else ifeq ($(ARCH),aarch64)
@@ -78,9 +78,59 @@ build/armv6/%.o: kernel/src/%.c
 	@mkdir -p build/armv6
 	$(CC) $(CFLAGS) -c $< -o $@
 
+build/armv6/kernel.o: arch/armv6/kernel.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/cpu.o: arch/armv6/cpu.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/vectors.o: arch/armv6/vectors.S
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/serial.o: kernel/src/serial.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/mailbox.o: kernel/src/mailbox.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/hdmi.o: kernel/src/hdmi.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/pmm.o: kernel/src/pmm.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/console.o: kernel/src/console.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/vfs.o: kernel/src/vfs.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/shell.o: kernel/src/shell.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/auth.o: kernel/src/auth.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/log.o: kernel/src/log.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
 $(TARGET): $(OBJS) linker/armv6.ld
 	@mkdir -p build/armv6
-	$(LD) $(LDFLAGS) $(OBJS) -o $(TARGET)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJS) -lgcc -o $(TARGET)
+	arm-none-eabi-objcopy $(TARGET) -O binary build/armv6/kernel7.img
+	cp build/armv6/kernel7.img kernel7.img
 
 else ifeq ($(ARCH),aarch64)
 build/aarch64/%.o: arch/aarch64/%.c

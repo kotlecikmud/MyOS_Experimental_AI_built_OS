@@ -29,9 +29,13 @@ void kernel_panic(const char* message) {
     serial_print("\n");
     serial_print("System halted safely.\n");
     serial_print("==================================================\n");
-    
+
     // Halt CPU
     for (;;) {
+#ifdef __x86_64__
         __asm__ volatile ("cli; hlt");
+#else
+        __asm__ volatile ("");
+#endif
     }
 }

@@ -1,0 +1,8 @@
+# Raspberry Pi Zero W (ARMv6 / ARM1176JZF-S)
+arm_64bit=0
+kernel=kernel7.img
+enable_uart=1
+hdmi_force_hotplug=1
+hdmi_group=2
+hdmi_mode=4
+disable_overscan=1
