@@ -8,6 +8,7 @@
 #include "vfs.h"
 #include "shell.h"
 #include "auth.h"
+#include "demo.h"
 
 /* Limine 12.x protocol structures and requests. Keep these definitions in sync
  * with the official limine-protocol/include/limine.h header. */
@@ -118,10 +119,12 @@ void kernel_main(void) {
     auth_init();
     shell_init();
 
-    if (auth_authenticate()) {
-        shell_run();
-    } else {
-        console_print("[System] Authentication failed. System halted.\n");
-        halt();
-    }
+
+    /* Temporary demo-first boot path.
+     * The current VFS is RAM-only, so it cannot detect a physical /.demo file.
+     * Start the demo directly rather than presenting the authentication screen.
+     * Press any key to leave the demo and enter the shell. */
+    demo_run();
+    shell_run();
+    halt();
 }

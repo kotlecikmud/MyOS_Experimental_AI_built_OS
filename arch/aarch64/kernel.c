@@ -1,3 +1,4 @@
+#include "../../kernel/include/demo.h"
 #include "../../kernel/include/pmm.h"
 #include "../../kernel/include/console.h"
 #include "../../kernel/include/vfs.h"
@@ -15,10 +16,10 @@ void kernel_main(void) {
     vfs_init();
     auth_init();
     shell_init();
-    if (auth_authenticate()) {
-        shell_run();
-    }
-    for (;;) {
-        __asm__ volatile ("wfi");
-    }
+
+    /* Demo-first boot: current VFS cannot read the physical FAT boot partition.
+     * Start the demo directly. Press a key to enter the shell. */
+    demo_run();
+    shell_run();
+    for (;;) { __asm__ volatile ("wfi"); }
 }

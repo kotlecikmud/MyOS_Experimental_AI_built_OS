@@ -27,16 +27,64 @@ void console_print(const char *s) {
 #endif
 }
 char console_getchar(void) { return serial_getchar(); }
-int console_getline(char *buf, int max_len) {
-    int idx = 0;
-    while (idx < max_len - 1) {
-        char c = console_getchar();
-        if (c == '\r' || c == '\n') {
-            console_putchar('\n'); buf[idx] = '\0'; return idx;
-        } else if (c == '\b' || c == 127) {
-            if (idx > 0) { --idx; console_putchar('\b'); console_putchar(' '); console_putchar('\b'); }
-        } else if (c) { buf[idx++] = c; console_putchar(c); }
+
+int console_check_key(void) { return serial_received(); }
+
+void console_draw_cursor(bool visible) {
+    static bool cursor_drawn = false;
+    if (visible && !cursor_drawn) {
+        console_putchar('_');
+        cursor_drawn = true;
+    } else if (!visible && cursor_drawn) {
+        console_print("\b \b");
+        cursor_drawn = false;
     }
-    buf[max_len - 1] = '\0';
-    return idx;
+}
+
+/* Read a line without blocking the CPU indefinitely. The cursor is refreshed
+ * while waiting, and every received character immediately removes it. */
+int console_getline(char *buf, int max_len) {
+    if (!buf || max_len < 2) return 0;
+
+    int idx = 0;
+    unsigned int blink = 0;
+    bool cursor_visible = false;
+
+    for (;;) {
+        char c;
+        if (!serial_try_getchar(&c)) {
+            /* A bounded delay makes the blink visible on both UART and HDMI.
+             * This is a polling console; no timer/interrupt dependency. */
+            for (volatile unsigned int d = 0; d < 12000; ++d) {
+                __asm__ volatile ("nop");
+            }
+            if (++blink >= 35) {
+                cursor_visible = !cursor_visible;
+                console_draw_cursor(cursor_visible);
+                blink = 0;
+            }
+            continue;
+        }
+
+        console_draw_cursor(false);
+        cursor_visible = false;
+        blink = 0;
+
+        if (c == '\r' || c == '\n') {
+            console_putchar('\n');
+            buf[idx] = '\0';
+            return idx;
+        }
+        if (c == '\b' || c == 127) {
+            if (idx > 0) {
+                --idx;
+                console_print("\b \b");
+            }
+            continue;
+        }
+        if (c >= 32 && c <= 126 && idx < max_len - 1) {
+            buf[idx++] = c;
+            console_putchar(c);
+        }
+    }
 }

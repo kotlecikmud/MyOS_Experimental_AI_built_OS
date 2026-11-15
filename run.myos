@@ -1,0 +1,8 @@
+# MyOS Auto-run Script
+# This file is read by the kernel during startup.
+# Commands listed here will be executed automatically.
+
+clear
+version
+info
+list

@@ -94,3 +94,21 @@ QEMU additionally requires an OVMF firmware image (paths vary by distribution).
 The ARMv6 and AArch64 build targets remain separate and continue to use their
 respective `arm-none-eabi-*` and `aarch64-none-elf-*` cross-compilers. The x86-64
 native compiler change does not provide those cross-compilers.
+
+
+## Important storage limitation (current build)
+
+The current VFS is an in-memory demonstration filesystem, not a disk filesystem.
+It does not mount or read the Raspberry Pi FAT boot partition (and it does not
+read files from a PC disk either). Consequently, `.demo` and `run.myos` files
+placed on a physical boot partition cannot yet trigger boot actions. Previous
+startup code incorrectly inserted a synthetic `/run.myos` node into the RAM VFS,
+which made auto-login appear enabled on every boot; that false-positive has
+been removed. A real SD-card block driver and FAT filesystem are required to
+make physical boot-partition marker files work.
+
+The console now polls the UART receive register directly, supports nonblocking
+key detection, and blinks an underscore cursor while waiting for a line. Run
+`demo` from the shell to launch the built-in demo manually. The demo is included in the x86-64 build as well as the ARMv6 build, and any key
+press exits the demo. Automatic `.demo` selection remains gated on implementing
+the boot-volume filesystem described above.

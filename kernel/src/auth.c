@@ -47,6 +47,12 @@ void auth_init(void) {
 }
 
 int auth_authenticate(void) {
+    // Check if we should auto-login
+    if (vfs_find_node_by_path("/run.myos") != -1) {
+        console_print("[Auth] Auto-login enabled via /run.myos file.\n");
+        return 1;
+    }
+
     console_print("\n==================================================\n");
     console_print(" MyOS Security & Authentication (Milestone 6)     \n");
     console_print("==================================================\n\n");

@@ -48,6 +48,16 @@ static int add_node(const char* name, vfs_node_type_t type, int parent_idx) {
     return idx;
 }
 
+int vfs_find_node_by_path(const char* path) {
+    if (path[0] == '/' && path[1] == '\0') return 0;
+    
+    // Simple implementation: only supports root-level files for now
+    if (path[0] == '/') {
+        return find_child(0, path + 1);
+    }
+    return find_child(0, path);
+}
+
 void vfs_init(void) {
     node_count = 0;
     // Create root "/"

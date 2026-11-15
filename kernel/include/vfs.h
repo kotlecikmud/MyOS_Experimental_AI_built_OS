@@ -17,6 +17,7 @@ void vfs_init(void);
 int vfs_change_dir(const char* path);
 void vfs_list_dir(void);
 const char* vfs_get_current_path(void);
+int vfs_find_node_by_path(const char* path);
 
 #endif /* VFS_H */
 #endif

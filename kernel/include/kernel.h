@@ -43,4 +43,6 @@ static inline void halt(void) {
     }
 }
 
+void demo_run(void);
+
 #endif /* KERNEL_H */

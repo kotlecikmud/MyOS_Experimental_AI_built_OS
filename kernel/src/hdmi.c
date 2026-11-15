@@ -153,6 +153,11 @@ void rpi_hdmi_print(const char *s) {
     if (!s || !framebuffer) return;
     while (*s) {
         if (*s == '\r') { ++s; continue; }
+        if (*s == '\b') {
+            if (cursor_x >= 7) cursor_x -= 7;
+            ++s;
+            continue;
+        }
         if (*s == '\n') { cursor_x = 0; cursor_y += 10; scroll_if_needed(); ++s; continue; }
         rpi_hdmi_draw_char(cursor_x, cursor_y, *s++, 0x00ffffffu, 0x00101828u);
         cursor_x += 7;

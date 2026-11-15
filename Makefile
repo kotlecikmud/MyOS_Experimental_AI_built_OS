@@ -8,7 +8,7 @@ ifeq ($(ARCH),x86_64)
     LD = ld
     CFLAGS = -Wall -Wextra -O2 -std=gnu11 -ffreestanding -fno-stack-protector -fno-pie -fno-pic -fno-asynchronous-unwind-tables -fno-unwind-tables -mcmodel=kernel -mno-red-zone -Ikernel/include -Ikernel/core/include
     LDFLAGS = -T linker.ld -nostdlib -static -z max-page-size=0x1000
-    SRCS = kernel/src/kernel.c kernel/src/serial.c kernel/src/gdt.c kernel/src/idt.c kernel/src/memory.c kernel/src/pmm.c kernel/src/log.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c
+    SRCS = kernel/src/kernel.c kernel/src/serial.c kernel/src/gdt.c kernel/src/idt.c kernel/src/memory.c kernel/src/pmm.c kernel/src/log.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/demo.c
     OBJS = $(addprefix build/x86_64/, $(notdir $(SRCS:.c=.o)))
     TARGET = build/x86_64/kernel.elf
     ISO = build/x86_64/myos.iso
@@ -18,8 +18,8 @@ else ifeq ($(ARCH),armv6)
     LD = arm-none-eabi-ld
     CFLAGS = -Wall -Wextra -O2 -ffreestanding -mcpu=arm1176jzf-s -marm -Ikernel/include
     LDFLAGS = -T linker/armv6.ld -nostdlib -static
-    SRCS = arch/armv6/kernel.c arch/armv6/cpu.c arch/armv6/vectors.S kernel/src/serial.c kernel/src/mailbox.c kernel/src/hdmi.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c
-    OBJS = build/armv6/kernel.o build/armv6/cpu.o build/armv6/vectors.o build/armv6/serial.o build/armv6/mailbox.o build/armv6/hdmi.o build/armv6/pmm.o build/armv6/console.o build/armv6/vfs.o build/armv6/shell.o build/armv6/auth.o build/armv6/log.o
+    SRCS = arch/armv6/kernel.c arch/armv6/cpu.c arch/armv6/vectors.S kernel/src/serial.c kernel/src/mailbox.c kernel/src/hdmi.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c kernel/src/demo.c
+    OBJS = build/armv6/kernel.o build/armv6/cpu.o build/armv6/vectors.o build/armv6/serial.o build/armv6/mailbox.o build/armv6/hdmi.o build/armv6/pmm.o build/armv6/console.o build/armv6/vfs.o build/armv6/shell.o build/armv6/auth.o build/armv6/log.o build/armv6/demo.o
     TARGET = build/armv6/kernel.img
 
 else ifeq ($(ARCH),aarch64)
@@ -27,7 +27,7 @@ else ifeq ($(ARCH),aarch64)
     LD = aarch64-none-elf-ld
     CFLAGS = -Wall -Wextra -O2 -ffreestanding -mcpu=cortex-a53 -Ikernel/include
     LDFLAGS = -T linker/aarch64.ld -nostdlib -static
-    SRCS = arch/aarch64/kernel.c arch/aarch64/cpu.c arch/aarch64/vectors.S kernel/src/serial.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c
+    SRCS = arch/aarch64/kernel.c arch/aarch64/cpu.c arch/aarch64/vectors.S kernel/src/serial.c kernel/src/pmm.c kernel/src/console.c kernel/src/vfs.c kernel/src/shell.c kernel/src/auth.c kernel/src/log.c kernel/src/demo.c
     OBJS = $(addprefix build/aarch64/, $(notdir $(SRCS:.c=.o) $(SRCS:.S=.o)))
     TARGET = build/aarch64/kernel8.img
 endif
@@ -123,6 +123,10 @@ build/armv6/auth.o: kernel/src/auth.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 build/armv6/log.o: kernel/src/log.c
+	@mkdir -p build/armv6
+	$(CC) $(CFLAGS) -c $< -o $@
+
+build/armv6/demo.o: kernel/src/demo.c
 	@mkdir -p build/armv6
 	$(CC) $(CFLAGS) -c $< -o $@
 

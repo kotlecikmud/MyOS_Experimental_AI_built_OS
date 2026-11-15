@@ -27,7 +27,7 @@ if arch == "x86_64":
     ld = os.environ.get("LD", "ld")
     cflags = ["-Wall", "-Wextra", "-O2", "-ffreestanding", "-fno-stack-protector", "-fno-pie", "-fno-pic", "-mcmodel=kernel", "-mno-red-zone", "-Ikernel/include"]
     ldflags = ["-T", "linker.ld", "-nostdlib", "-static", "-z", "max-page-size=0x1000"]
-    sources = ["kernel/src/kernel.c", "kernel/src/serial.c", "kernel/src/gdt.c", "kernel/src/idt.c", "kernel/src/memory.c", "kernel/src/pmm.c", "kernel/src/log.c", "kernel/src/console.c", "kernel/src/vfs.c", "kernel/src/shell.c", "kernel/src/auth.c"]
+    sources = ["kernel/src/kernel.c", "kernel/src/serial.c", "kernel/src/gdt.c", "kernel/src/idt.c", "kernel/src/memory.c", "kernel/src/pmm.c", "kernel/src/log.c", "kernel/src/console.c", "kernel/src/vfs.c", "kernel/src/shell.c", "kernel/src/auth.c", "kernel/src/demo.c"]
     objs = []
     for src in sources:
         obj = f"build/x86_64/{os.path.basename(src).replace('.c', '.o')}"
@@ -64,6 +64,7 @@ elif arch == "armv6":
         ("kernel/src/shell.c", "c"),
         ("kernel/src/auth.c", "c"),
         ("kernel/src/log.c", "c"),
+        ("kernel/src/demo.c", "c"),
     ]
     objs = []
     for src, stype in srrs:
@@ -101,6 +102,7 @@ elif arch == "aarch64":
         ("kernel/src/shell.c", "c"),
         ("kernel/src/auth.c", "c"),
         ("kernel/src/log.c", "c"),
+        ("kernel/src/demo.c", "c"),
     ]
     objs = []
     for src, stype in srrs:

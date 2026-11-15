@@ -70,6 +70,16 @@ void serial_putchar(char c) {
 char serial_getchar(void) { return serial_read(); }
 #endif
 
+int serial_try_getchar(char *out) {
+    if (!out || !serial_received()) return 0;
+#if defined(__arm__)
+    *out = (char)MMIO32(UART_DR);
+#else
+    *out = (char)inb(COM1_PORT);
+#endif
+    return 1;
+}
+
 void serial_print(const char *s) {
     while (*s) serial_putchar(*s++);
 }
