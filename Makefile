@@ -43,32 +43,23 @@ $(TARGET): $(OBJS) linker.ld
 	@mkdir -p build/x86_64
 	$(LD) $(LDFLAGS) $(OBJS) -o $(TARGET)
 
-LIMINE_DIR = limine-binary
-LIMINE_STAMP = $(LIMINE_DIR)/.extracted
+# (Limine binaries are pre-provided in limine-binary/)
 
-# The source archive includes the official Limine binary release tarball.
-$(LIMINE_STAMP): limine-binary.tar.gz
-	tar -xzf $<
-	touch $@
-
-$(LIMINE_DIR)/limine: $(LIMINE_STAMP)
-	$(MAKE) -C $(LIMINE_DIR)
-
-$(ISO): $(TARGET) limine.conf $(LIMINE_DIR)/limine
+$(ISO): $(TARGET) limine.conf
 	rm -rf iso_root
 	mkdir -p iso_root/boot/limine iso_root/EFI/BOOT
 	cp $(TARGET) iso_root/boot/kernel.elf
 	cp limine.conf iso_root/boot/limine/limine.conf
-	cp $(LIMINE_DIR)/limine-bios.sys iso_root/boot/limine/
-	cp $(LIMINE_DIR)/limine-bios-cd.bin iso_root/boot/
-	cp $(LIMINE_DIR)/limine-uefi-cd.bin iso_root/boot/
-	cp $(LIMINE_DIR)/BOOTX64.EFI iso_root/EFI/BOOT/BOOTX64.EFI
+	cp limine-binary/limine-bios.sys iso_root/boot/limine/
+	cp limine-binary/limine-bios-cd.bin iso_root/boot/
+	cp limine-binary/limine-uefi-cd.bin iso_root/boot/
+	cp limine-binary/BOOTX64.EFI iso_root/EFI/BOOT/BOOTX64.EFI
 	xorriso -as mkisofs -R -r -J -b boot/limine-bios-cd.bin \
 		-no-emul-boot -boot-load-size 4 -boot-info-table -hfsplus \
 		-apm-block-size 2048 --efi-boot boot/limine-uefi-cd.bin \
 		-efi-boot-part --efi-boot-image --protective-msdos-label \
 		iso_root -o $(ISO)
-	$(LIMINE_DIR)/limine bios-install $(ISO)
+	limine-binary/limine bios-install $(ISO)
 
 iso: $(ISO)
 run: $(ISO)
